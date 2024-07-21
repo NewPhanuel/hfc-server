@@ -1,0 +1,31 @@
+{
+    "name": "dev-phanuel/hfc-server",
+    "description": "A RESTful API for Happy Family Chapel Website.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "DevPhanuel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Omamowho Phanuel",
+            "email": "omamowhophanuel@gmail.com"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "8.1.0"
+        }
+    },
+    "require": {
+        "php": ">=8.1.0",
+        "firebase/php-jwt": "^6.10",
+        "respect/validation": "^2.3",
+        "ph-7/php-http-response-header": "^1.0",
+        "ramsey/uuid": "^4.7",
+        "gabordemooij/redbean": "^5.7",
+        "vlucas/phpdotenv": "^5.6",
+        "filp/whoops": "^2.15"
+    }
+}
