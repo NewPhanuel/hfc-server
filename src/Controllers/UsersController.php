@@ -99,12 +99,13 @@ class UsersController
             ->setUpdatedAt($data->updatedAt);
 
         $accountEntity = new AccountEntity();
-        $accountEntity->setUserUuid($data->userUuid);
+        $accountEntity->setUserUuid($data->userUuid)->setCreatedAt($data->createdAt)
+            ->setUpdatedAt($data->updatedAt);
 
         if (UserModel::store($userEntity, $accountEntity))
             response(StatusCode::CREATED, successMessage('User successfully created', $data));
 
-        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'User successfully created', StatusCode::INTERNAL_SERVER_ERROR));
+        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'User could not be created', StatusCode::INTERNAL_SERVER_ERROR));
     }
 
     public function update(array $params): void
@@ -123,6 +124,8 @@ class UsersController
         $data->updatedAt = date(self::DATE_TIME_FORMAT);
 
         $userEntity = new UserEntity();
+        $accountEntity = new AccountEntity();
+
         if (isset($data->firstname))
             $userEntity->setFirstname($data->firstname);
         if (isset($data->lastname))
@@ -141,9 +144,29 @@ class UsersController
             $userEntity->setDepartment($data->department);
         if (isset($data->department_level))
             $userEntity->setDepartmentLevel($data->department_level);
+        if (isset($data->account)) {
+            if (isset($data->account->email))
+                $accountEntity->setEmail($data->account->email);
+            if (isset($data->account->password))
+                $accountEntity->setPassword($data->account->password);
+            if (isset($data->account->guarantor_name))
+                $accountEntity->setGuarantorName($data->account->guarantor_name);
+            if (isset($data->account->guarantor_phone))
+                $accountEntity->setGuarantorPhone($data->account->guarantor_phone);
+            if (isset($data->account->bank_name))
+                $accountEntity->setBankName($data->account->bank_name);
+            if (isset($data->account->acct_number))
+                $accountEntity->setAcctNumber($data->account->acct_number);
+            if (isset($data->account->acct_name))
+                $accountEntity->setAcctName($data->account->acct_name);
+        }
+        $accountEntity->setUpdatedAt($data->updatedAt);
         $userEntity->setUpdatedAt($data->updatedAt);
 
-        $user = UserModel::update($uuid, $userEntity);
+        $user = UserModel::update($uuid, $userEntity, $accountEntity);
+        if ($user === null)
+            response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'User could not be updated', StatusCode::INTERNAL_SERVER_ERROR));
+
         unset($user['id']);
         unset($user['session_token']);
         response(StatusCode::OK, successMessage('User successfully updated', $user));
@@ -152,6 +175,21 @@ class UsersController
     public function show(array $params): void
     {
         $uuid = $params['uuid'];
+
+        if (!$this->SchemaValidation->validateUuid($uuid)) {
+            throw new InvalidValidationException('Invalid User UUID');
+        }
+
+        $user = UserModel::show($uuid);
+        unset($user['id']);
+        unset($user['session_token']);
+        response(StatusCode::OK, successMessage('User successfully retrieved from the server', $user));
+        return;
+    }
+
+    public function getUser(array $params): void
+    {
+        $uuid = $params['user']->data->uuid;
 
         if (!$this->SchemaValidation->validateUuid($uuid)) {
             throw new InvalidValidationException('Invalid User UUID');
@@ -179,5 +217,91 @@ class UsersController
 
         response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('SQLError', 'For some reason, the user could not be deleted', StatusCode::INTERNAL_SERVER_ERROR));
         return;
+    }
+
+    public function updateByAdmin(array $params): void
+    {
+        $data = $params['data'];
+        $uuid = $params['uuid'];
+
+        if (!$this->SchemaValidation->validateUserSchemaForUpdate($data)) {
+            throw new InvalidValidationException('Schema does not follow validation rules');
+        }
+
+        if (!$this->SchemaValidation->validateUuid($uuid)) {
+            throw new InvalidValidationException('Invalid User UUID');
+        }
+
+        $data->updatedAt = date(self::DATE_TIME_FORMAT);
+
+        $userEntity = new UserEntity();
+        $accountEntity = new AccountEntity();
+
+        if (isset($data->firstname))
+            $userEntity->setFirstname($data->firstname);
+        if (isset($data->lastname))
+            $userEntity->setLastname($data->lastname);
+        if (isset($data->profile_pics))
+            $userEntity->setProfilePics($data->profile_pics);
+        if (isset($data->gender))
+            $userEntity->setGender($data->gender);
+        if (isset($data->phone))
+            $userEntity->setPhone($data->phone);
+        if (isset($data->dob))
+            $userEntity->setDob($data->dob);
+        if (isset($data->role))
+            $userEntity->setRole($data->role);
+        if (isset($data->is_restricted))
+            $userEntity->setIsRestricted($data->is_restricted);
+        if (isset($data->can_access_quiz))
+            $userEntity->setCanAccessQuiz($data->can_access_quiz);
+        if (isset($data->address))
+            $userEntity->setAddress($data->address);
+        if (isset($data->department))
+            $userEntity->setDepartment($data->department);
+        if (isset($data->department_level))
+            $userEntity->setDepartmentLevel($data->department_level);
+        if (isset($data->quiz_attempt))
+            $userEntity->setQuizAttempt($data->quiz_attempt);
+        if (isset($data->scores))
+            $userEntity->setScores($data->scores);
+        if (isset($data->account)) {
+            if (isset($data->account->email))
+                $accountEntity->setEmail($data->account->email);
+            if (isset($data->account->password))
+                $accountEntity->setPassword($data->account->password);
+            if (isset($data->account->is_funded))
+                $accountEntity->setIsFunded($data->account->is_funded);
+            if (isset($data->account->total_funding))
+                $accountEntity->setTotalFunding($data->account->total_funding);
+            if (isset($data->account->total_earning))
+                $accountEntity->setTotalEarning($data->account->total_earning);
+            if (isset($data->account->earning_balance))
+                $accountEntity->setEarningBalance($data->account->earning_balance);
+            if (isset($data->account->remitted_payment))
+                $accountEntity->setRemittedPayment($data->account->remitted_payment);
+            if (isset($data->account->guarantor_name))
+                $accountEntity->setGuarantorName($data->account->guarantor_name);
+            if (isset($data->account->guarantor_phone))
+                $accountEntity->setGuarantorPhone($data->account->guarantor_phone);
+            if (isset($data->account->bank_name))
+                $accountEntity->setBankName($data->account->bank_name);
+            if (isset($data->account->acct_number))
+                $accountEntity->setAcctNumber($data->account->acct_number);
+            if (isset($data->account->acct_name))
+                $accountEntity->setAcctName($data->account->acct_name);
+            if (isset($data->account->is_deactivated))
+                $accountEntity->setIsDeactivated($data->account->is_deactivated);
+        }
+        $accountEntity->setUpdatedAt($data->updatedAt);
+        $userEntity->setUpdatedAt($data->updatedAt);
+
+        $user = UserModel::update($uuid, $userEntity, $accountEntity);
+        if ($user === null)
+            response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'User could not be updated', StatusCode::INTERNAL_SERVER_ERROR));
+
+        unset($user['id']);
+        unset($user['session_token']);
+        response(StatusCode::OK, successMessage('User successfully updated', $user));
     }
 }

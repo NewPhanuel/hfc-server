@@ -3,11 +3,13 @@
 // User routes
 $router->get('api/v1/users', 'UsersController@index', 'admin');
 $router->get('api/v1/users/{uuid}', 'UsersController@show', 'admin');
-$router->get('api/v1/users/me', 'UsersController@show', 'auth');
+$router->get('api/v1/profile', 'UsersController@getUser', 'auth');
 
 $router->post('api/v1/users', 'UsersController@store', 'guest');
+$router->post('api/v1/admin/users', 'UsersController@storeByAdmin', 'admin');
 
 $router->put('api/v1/users', 'UsersController@update', 'auth');
+$router->put('api/v1/users/{uuid}', 'UsersController@updateByAdmin', 'admin');
 
 $router->delete('api/v1/users/{uuid}', 'UsersController@destroy', 'admin');
 

@@ -13,10 +13,10 @@ class AccountEntity
     private ?string $email = null;
     private ?string $password = null;
     private Boolean $isFunded = Boolean::TRUE;
-    private ?int $totalFunding = 0;
-    private ?int $totalEarning = 0;
-    private ?int $earningBalance = 0;
-    private ?int $remittedPayment = 0;
+    private ?float $totalFunding = 0;
+    private ?float $totalEarning = 0;
+    private ?float $earningBalance = 0;
+    private ?float $remittedPayment = 0;
     private ?string $guarantorName = null;
     private ?string $guarantorPhone = null;
     private ?string $bankName = null;
@@ -112,7 +112,7 @@ class AccountEntity
     /**
      * Get the value of totalFunding
      */
-    public function getTotalFunding(): ?int
+    public function getTotalFunding(): ?float
     {
         return $this->totalFunding;
     }
@@ -122,9 +122,9 @@ class AccountEntity
      *
      * @return  self
      */
-    public function setTotalFunding(string|int $totalFunding): self
+    public function setTotalFunding(string|float $totalFunding): self
     {
-        $this->totalFunding = (int) $totalFunding;
+        $this->totalFunding = (float) $totalFunding;
 
         return $this;
     }
@@ -132,7 +132,7 @@ class AccountEntity
     /**
      * Get the value of totalEarning
      */
-    public function getTotalEarning(): ?int
+    public function getTotalEarning(): ?float
     {
         return $this->totalEarning;
     }
@@ -142,9 +142,9 @@ class AccountEntity
      *
      * @return  self
      */
-    public function setTotalEarning(string|int $totalEarning): self
+    public function setTotalEarning(string|float $totalEarning): self
     {
-        $this->totalEarning = (int) $totalEarning;
+        $this->totalEarning = (float) $totalEarning;
 
         return $this;
     }
@@ -152,7 +152,7 @@ class AccountEntity
     /**
      * Get the value of earningBalance
      */
-    public function getEarningBalance(): ?int
+    public function getEarningBalance(): ?float
     {
         return $this->earningBalance;
     }
@@ -162,9 +162,9 @@ class AccountEntity
      *
      * @return  self
      */
-    public function setEarningBalance(string|int $earningBalance): self
+    public function setEarningBalance(string|float $earningBalance): self
     {
-        $this->earningBalance = (int) $earningBalance;
+        $this->earningBalance = (float) $earningBalance;
 
         return $this;
     }
@@ -172,7 +172,7 @@ class AccountEntity
     /**
      * Get the value of remittedPayment
      */
-    public function getRemittedPayment(): ?int
+    public function getRemittedPayment(): ?float
     {
         return $this->remittedPayment;
     }
@@ -182,9 +182,9 @@ class AccountEntity
      *
      * @return  self
      */
-    public function setRemittedPayment(string|int $remittedPayment): self
+    public function setRemittedPayment(string|float $remittedPayment): self
     {
-        $this->remittedPayment = (int) $remittedPayment;
+        $this->remittedPayment = (float) $remittedPayment;
 
         return $this;
     }

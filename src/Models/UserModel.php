@@ -49,7 +49,7 @@ final class UserModel
         return null;
     }
 
-    public static function update(string $uuid, UserEntity $userEntity): mixed
+    public static function update(string $uuid, UserEntity $userEntity, AccountEntity $accountEntity): mixed
     {
         $userBean = R::findOne(self::TABLE_NAME, 'user_uuid = ?', [$uuid]);
         if (!$userBean) {
@@ -74,21 +74,40 @@ final class UserModel
             $userBean['department'] = $userEntity->getDepartment();
         if ($userEntity->getDepartmentLevel())
             $userBean['department_level'] = $userEntity->getDepartmentLevel();
-        if ($userEntity->getUpdatedAt())
-            $userBean['updated_at'] = $userEntity->getUpdatedAt();
-        R::store($userBean);
+        if ($userEntity->getRole())
+            $userBean['role'] = $userEntity->getRole()->value;
+        if ($userEntity->getIsRestricted())
+            $userBean['is_restricted'] = $userEntity->getIsRestricted()->value;
+        if ($userEntity->getCanAccessQuiz())
+            $userBean['can_access_quiz'] = $userEntity->getCanAccessQuiz()->value;
+        if ($userEntity->getQuizAttempt())
+            $userBean['quiz_attempt'] = $userEntity->getQuizAttempt();
+        if ($userEntity->getScores())
+            $userBean['scores'] = $userEntity->getScores();
+        $userBean['updated_at'] = $userEntity->getUpdatedAt();
+        $account = AccountModel::update($uuid, $accountEntity);
+
+        if (is_array($account)) {
+            $user = $userBean->export();
+            $user['account'] = $account;
+            R::store($userBean);
+            R::close();
+            return $user;
+        }
         R::close();
-        return $userBean;
+        return null;
     }
 
     public static function show(string $uuid): array
     {
         $userBean = R::findOne(self::TABLE_NAME, 'user_uuid = ?', [$uuid]);
-        $userAccount = AccountModel::get($uuid);
+        $userAccount = AccountModel::show($uuid);
         if (!$userBean && !$userAccount) {
             throw new InvalidValidationException('Invalid User UUID');
         }
-        return $userBean->export();
+        $user = $userBean->export();
+        $user['account'] = $userAccount;
+        return $user;
     }
 
     public static function get(string $uuid): array
