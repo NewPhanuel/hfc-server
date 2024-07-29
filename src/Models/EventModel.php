@@ -24,6 +24,7 @@ final class EventModel
         $eventBean['description'] = $eventEntity->getDescription();
         $eventBean['event_date'] = $eventEntity->getDate();
         $eventBean['event_image'] = $eventEntity->getImage();
+        $eventBean['created_by'] = $eventEntity->getCreatedBy();
         $eventBean['created_at'] = $eventEntity->getCreatedAt();
         $eventBean['updated_at'] = $eventEntity->getUpdatedAt();
         $beanId = R::store($eventBean);

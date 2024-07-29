@@ -13,10 +13,7 @@ class SchemaValidation
 
     public function validateUserSchema(object $data): bool
     {
-        $schemaValidator = validate::attribute('firstname', validate::stringType()->length(self::MIN_NAME_LENGTH, self::MAX_NAME_LENGTH))
-            ->attribute('lastname', validate::stringType()->length(self::MIN_NAME_LENGTH, self::MAX_NAME_LENGTH))
-            ->attribute('email', validate::email())
-            ->attribute('phone', validate::phone())
+        $schemaValidator = validate::attribute('email', validate::email())
             ->attribute('password', validate::regex(self::PASSWORD_REGEX));
         return $schemaValidator->validate($data);
     }
@@ -28,9 +25,28 @@ class SchemaValidation
             ->attribute('profile_pics', validate::stringType(), mandatory: false)
             ->attribute('gender', validate::stringType(), mandatory: false)
             ->attribute('dob', validate::date(), mandatory: false)
-            ->attribute('worker_status', validate::stringType(), mandatory: false)
+            ->attribute('phone', validate::phone(), mandatory: false)
+            ->attribute('role', validate::stringType(), mandatory: false)
+            ->attribute('is_restricted', validate::stringType(), mandatory: false)
+            ->attribute('can_access_quiz', validate::stringType(), mandatory: false)
+            ->attribute('address', validate::stringType(), mandatory: false)
             ->attribute('department', validate::stringType(), mandatory: false)
-            ->attribute('workers_certificate', validate::stringType(), mandatory: false);
+            ->attribute('department_level', validate::stringType(), mandatory: false)
+            ->attribute('quiz_attempt', validate::stringType(), mandatory: false)
+            ->attribute('scores', validate::stringType(), mandatory: false)
+            ->key('account', validate::key('email', validate::email(), mandatory: false)
+                ->key('password', validate::regex(self::PASSWORD_REGEX), mandatory: false)
+                ->key('is_funded', validate::stringType(), mandatory: false)
+                ->key('total_funding', validate::stringType(), mandatory: false)
+                ->key('total_earning', validate::stringType(), mandatory: false)
+                ->key('earning_balance', validate::stringType(), mandatory: false)
+                ->key('remitted_payment', validate::stringType(), mandatory: false)
+                ->key('guarantor_name', validate::stringType(), mandatory: false)
+                ->key('guarantor_phone', validate::stringType(), mandatory: false)
+                ->key('bank_name', validate::stringType(), mandatory: false)
+                ->key('acct_number', validate::stringType(), mandatory: false)
+                ->key('acct_name', validate::stringType(), mandatory: false)
+                ->key('is_deactivated', validate::stringType(), mandatory: false), mandatory: false);
         return $schemaValidator->validate($data);
     }
 

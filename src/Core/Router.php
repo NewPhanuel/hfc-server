@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Core;
 
-use DevPhanuel\Core\Middleware\Authorize;
+use DevPhanuel\Core\Middleware\Authenticate;
 use PH7\JustHttp\StatusCode;
 use Throwable;
 
 class Router
 {
     protected array $routes = [];
+    protected Authenticate $Authenticate;
 
 
     /**
@@ -21,7 +22,7 @@ class Router
      * @param array $middleware
      * @return void
      */
-    public function registerRoute(string $method, string $uri, string $action, array $middleware = []): void
+    public function registerRoute(string $method, string $uri, string $action, string $middleware): void
     {
         list($controller, $controllerMethod) = explode('@', $action);
         $this->routes[] = [
@@ -38,10 +39,10 @@ class Router
      *
      * @param string $uri
      * @param string $action
-     * @param array $middleware
+     * @param string $middleware
      * @return void
      */
-    public function get(string $uri, string $action, array $middleware = []): void
+    public function get(string $uri, string $action, string $middleware): void
     {
         $this->registerRoute("GET", $uri, $action, $middleware);
     }
@@ -51,10 +52,10 @@ class Router
      *
      * @param string $uri
      * @param string $action
-     * @param array $middleware
+     * @param string $middleware
      * @return void
      */
-    public function post(string $uri, string $action, array $middleware = []): void
+    public function post(string $uri, string $action, string $middleware): void
     {
         $this->registerRoute("POST", $uri, $action, $middleware);
     }
@@ -64,10 +65,10 @@ class Router
      *
      * @param string $uri
      * @param string $action
-     * @param array $middleware
+     * @param string $middleware
      * @return void
      */
-    public function put(string $uri, string $action, array $middleware = []): void
+    public function put(string $uri, string $action, string $middleware): void
     {
         $this->registerRoute("PUT", $uri, $action, $middleware);
     }
@@ -77,9 +78,10 @@ class Router
      *
      * @param string $uri
      * @param string $action
+     * @param string $middleware
      * @return void
      */
-    public function delete(string $uri, string $action, array $middleware = []): void
+    public function delete(string $uri, string $action, string $middleware): void
     {
         $this->registerRoute("DELETE", $uri, $action, $middleware);
     }
@@ -94,6 +96,7 @@ class Router
     public function route(string $uri): void
     {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
+        $this->Authenticate = new Authenticate();
 
         if ($requestMethod === 'POST' && isset($_POST['_method'])) {
             $requestMethod = strtoupper($_POST['_method']);
@@ -132,9 +135,7 @@ class Router
                 }
 
                 if ($match) {
-                    foreach ($route['middleware'] as $middleware) {
-                        (new Authorize())->handle($middleware);
-                    }
+                    $params['user'] = $this->Authenticate->handle($route['middleware']);
 
                     $params['data'] = $data;
                     $controller = 'DevPhanuel\\Controllers\\' . $route['controller'];

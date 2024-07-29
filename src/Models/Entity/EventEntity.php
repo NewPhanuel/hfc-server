@@ -10,6 +10,7 @@ class EventEntity
     private ?string $description = null;
     private ?string $date = null;
     private ?string $image = null;
+    private string $createdBy;
     private string $createdAt;
     private string $updatedAt;
 
@@ -65,6 +66,17 @@ class EventEntity
     public function setImage(string $image): self
     {
         $this->image = $image;
+        return $this;
+    }
+
+    public function getCreatedBy(): string
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(string $createdBy): self
+    {
+        $this->createdBy = $createdBy;
         return $this;
     }
 

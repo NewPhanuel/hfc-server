@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace DevPhanuel\Models\Entity;
 
 use DevPhanuel\Models\Enums\Gender;
-use DevPhanuel\Models\Enums\WorkerStatus;
+use DevPhanuel\Models\Enums\Role;
+use DevPhanuel\Models\Enums\Boolean;
 use ErrorException;
 use ValueError;
 
@@ -19,9 +20,14 @@ class UserEntity
     private ?string $profilePics = null;
     private ?Gender $gender = null;
     private ?string $dob = null;
-    private ?WorkerStatus $workerStatus = null;
+    private Role $role = Role::USER;
+    private Boolean $isRestricted = Boolean::FALSE;
+    private Boolean $canAccessQuiz = Boolean::FALSE;
+    private ?string $address = null;
     private ?string $department = null;
-    private ?string $workersCertificate = null;
+    private ?string $departmentLevel = null;
+    private ?int $quizAttempt = 0;
+    private ?int $scores = 0;
     private string $createdAt;
     private string $updatedAt;
 
@@ -128,19 +134,72 @@ class UserEntity
         return $this;
     }
 
-    public function getWorkerStatus(): ?WorkerStatus
+    public function getRole(): Role
     {
-        return $this->workerStatus;
+        return $this->role;
     }
 
-    public function setWorkerStatus(string $workerStatus): self
+    public function setRole(string $role): self
     {
         try {
-            $this->workerStatus = WorkerStatus::from((int) $workerStatus);
+            $this->role = Role::from($role);
             return $this;
         } catch (ValueError) {
-            throw new ErrorException('Invalid worker status Type');
+            throw new ErrorException('Invalid Role Type');
         }
+    }
+
+    public function getIsRestricted(): Boolean
+    {
+        return $this->isRestricted;
+    }
+
+    public function setIsRestricted(string $isRestricted): self
+    {
+        try {
+            $this->isRestricted = Boolean::from($isRestricted);
+            return $this;
+        } catch (ValueError) {
+            throw new ErrorException('Invalid Boolean Type');
+        }
+    }
+
+    /**
+     * Get the value of canAccessQuiz
+     *
+     * @return Boolean
+     */
+    public function getCanAccessQuiz(): Boolean
+    {
+        return $this->canAccessQuiz;
+    }
+
+    /**
+     * Set the value of canAccessQuiz
+     *
+     * @param string $canAccessQuiz
+     *
+     * @return self
+     */
+    public function setCanAccessQuiz(string $canAccessQuiz): self
+    {
+        try {
+            $this->canAccessQuiz = Boolean::from($canAccessQuiz);
+            return $this;
+        } catch (ValueError) {
+            throw new ErrorException('Invalid Boolean Type');
+        }
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+        return $this;
     }
 
     public function getDepartment(): ?string
@@ -154,14 +213,36 @@ class UserEntity
         return $this;
     }
 
-    public function getWorkersCertificate(): ?string
+    public function getDepartmentLevel(): ?string
     {
-        return $this->workersCertificate;
+        return $this->departmentLevel;
     }
 
-    public function setWorkersCertificate(string $workersCertificate): self
+    public function setDepartmentLevel(string $departmentLevel): self
     {
-        $this->workersCertificate = $workersCertificate;
+        $this->departmentLevel = $departmentLevel;
+        return $this;
+    }
+
+    public function getQuizAttempt(): ?int
+    {
+        return $this->quizAttempt;
+    }
+
+    public function setQuizAttempt(string|int $quizAttempt): self
+    {
+        $this->quizAttempt = (int) $quizAttempt;
+        return $this;
+    }
+
+    public function getScores(): ?int
+    {
+        return $this->scores;
+    }
+
+    public function setScores(string|int $scores): self
+    {
+        $this->scores = (int) $scores;
         return $this;
     }
 
