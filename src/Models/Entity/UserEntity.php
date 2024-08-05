@@ -21,6 +21,7 @@ class UserEntity
     private ?Gender $gender = null;
     private ?string $dob = null;
     private Role $role = Role::USER;
+    private Boolean $isVerified = Boolean::FALSE;
     private Boolean $isRestricted = Boolean::FALSE;
     private Boolean $canAccessQuiz = Boolean::FALSE;
     private ?string $address = null;
@@ -28,6 +29,10 @@ class UserEntity
     private ?string $departmentLevel = null;
     private ?int $quizAttempt = 0;
     private ?int $scores = 0;
+    private ?int $verificationCode = null;
+    private ?string $emailVerifiedAt = null;
+    private ?int $OTP = null;
+    private ?string $lastPasswordReset = null;
     private string $createdAt;
     private string $updatedAt;
 
@@ -149,6 +154,21 @@ class UserEntity
         }
     }
 
+    public function getIsVerified(): Boolean
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(string $isVerified): self
+    {
+        try {
+            $this->isVerified = Boolean::from($isVerified);
+            return $this;
+        } catch (ValueError) {
+            throw new ErrorException('Invalid Boolean Type');
+        }
+    }
+
     public function getIsRestricted(): Boolean
     {
         return $this->isRestricted;
@@ -243,6 +263,50 @@ class UserEntity
     public function setScores(string|int $scores): self
     {
         $this->scores = (int) $scores;
+        return $this;
+    }
+
+    public function getVerificationCode(): ?int
+    {
+        return $this->verificationCode;
+    }
+
+    public function setVerificationCode(int $verificationCode): self
+    {
+        $this->verificationCode = $verificationCode;
+        return $this;
+    }
+
+    public function getEmailVerifiedAt(): ?string
+    {
+        return $this->emailVerifiedAt;
+    }
+
+    public function setEmailVerifiedAt(string $emailVerifiedAt): self
+    {
+        $this->emailVerifiedAt = $emailVerifiedAt;
+        return $this;
+    }
+
+    public function getOTP(): ?int
+    {
+        return $this->OTP;
+    }
+
+    public function setOTP(int $OTP): self
+    {
+        $this->OTP = $OTP;
+        return $this;
+    }
+
+    public function getLastPasswordReset(): ?string
+    {
+        return $this->lastPasswordReset;
+    }
+
+    public function setLastPasswordReset(string $lastPasswordReset): self
+    {
+        $this->lastPasswordReset = $lastPasswordReset;
         return $this;
     }
 

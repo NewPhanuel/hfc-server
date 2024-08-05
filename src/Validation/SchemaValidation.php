@@ -17,6 +17,20 @@ class SchemaValidation
             ->attribute('password', validate::regex(self::PASSWORD_REGEX));
         return $schemaValidator->validate($data);
     }
+    public function validateCode(string $code): bool
+    {
+        return validate::digit()->length(6, 6)->validate($code);
+    }
+    public function validateEmail(string $email): bool
+    {
+        return validate::email()->validate($email);
+    }
+    public function validatePasswordReset(object $data): bool
+    {
+        $schemaValidator = validate::attribute('code', validate::digit()->length(6, 6))
+            ->attribute('password', validate::regex(self::PASSWORD_REGEX));
+        return $schemaValidator->validate($data);
+    }
 
     public function validateUserSchemaForUpdate(object $data): bool
     {

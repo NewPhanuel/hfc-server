@@ -35,8 +35,9 @@ class Authenticate
             return null;
         }
 
-        if ($decoded->data->uuid !== $user['user_uuid'])
-            return null;
+        if (isset($decoded->data->uuid))
+            if ($decoded->data->uuid !== $user['user_uuid'])
+                return null;
         return $decoded;
     }
 
@@ -74,6 +75,16 @@ class Authenticate
                 response(StatusCode::UNAUTHORIZED, errorMessage('Not Authorized', "Login as an admin to access this route", StatusCode::UNAUTHORIZED));
                 return null;
             }
+        }
+
+        if ($role === 'new' && $user === null) {
+            response(StatusCode::UNAUTHORIZED, errorMessage('Not Authorized', "Create an account to access this route", StatusCode::UNAUTHORIZED));
+            return null;
+        }
+
+        if ($role === 'new' && isset($user->data->role)) {
+            response(StatusCode::UNAUTHORIZED, errorMessage('Not Authorized', "Only unverified can access this route", StatusCode::UNAUTHORIZED));
+            return null;
         }
 
         return $user;

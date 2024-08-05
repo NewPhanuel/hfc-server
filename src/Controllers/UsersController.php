@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Controllers;
 
+use DevPhanuel\Core\MailService;
+use DevPhanuel\Core\Middleware\LoginMiddleware;
+use DevPhanuel\Core\Middleware\VerificationRequestMiddleware;
 use DevPhanuel\Exception\InvalidValidationException;
 use DevPhanuel\Models\Entity\AccountEntity;
 use DevPhanuel\Models\UserModel;
@@ -32,7 +35,9 @@ class UsersController
         $user = UserModel::authorise(email: $data->email, password: $data->password);
 
         if (!is_array($user))
-            response(StatusCode::BAD_REQUEST, errorMessage('Validation Error', 'Invalid Credentials', StatusCode::BAD_REQUEST));
+            response(StatusCode::BAD_REQUEST, errorMessage('Credential Error', 'Invalid Credentials', StatusCode::BAD_REQUEST));
+
+        (new LoginMiddleware($user))->handle();
         $username = "{$user['firstname']} {$user['lastname']}";
 
         $payload = [
@@ -51,7 +56,7 @@ class UsersController
 
         $jwt = JWT::encode($payload, $_ENV['JWT_KEY'], $_ENV['JWT_ALGO']);
         if (UserModel::setSessionToken($jwt, $user['user_uuid']))
-            response(StatusCode::OK, successMessage("{$username} is successfully logged in", ["token" => $jwt]));
+            response(StatusCode::OK, successMessage("User successfully logged in", ["token" => $jwt]));
 
         response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Server Error', 'Could not store session token', StatusCode::INTERNAL_SERVER_ERROR));
     }
@@ -102,8 +107,26 @@ class UsersController
         $accountEntity->setUserUuid($data->userUuid)->setCreatedAt($data->createdAt)
             ->setUpdatedAt($data->updatedAt);
 
-        if (UserModel::store($userEntity, $accountEntity))
-            response(StatusCode::CREATED, successMessage('User successfully created', $data));
+        $verificationCode = MailService::sendCode($data->email);
+        if (!$verificationCode)
+            response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Mailer Error', 'Verification code could not be sent.', StatusCode::INTERNAL_SERVER_ERROR));
+
+        $userEntity->setVerificationCode($verificationCode);
+
+        $payload = [
+            "iss" => $_ENV['APP_URL'],
+            "iat" => time(),
+            "exp" => time() + 600,
+            "data" => [
+                "email" => $data->email,
+            ],
+        ];
+
+        if (UserModel::store($userEntity, $accountEntity)) {
+            $jwt = JWT::encode($payload, $_ENV['JWT_KEY'], $_ENV['JWT_ALGO']);
+            UserModel::setSessionToken($jwt, $data->userUuid);
+            response(StatusCode::CREATED, successMessage('User successfully registered', ['token' => $jwt]));
+        }
 
         response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'User could not be created', StatusCode::INTERNAL_SERVER_ERROR));
     }
@@ -198,6 +221,8 @@ class UsersController
         $user = UserModel::show($uuid);
         unset($user['id']);
         unset($user['session_token']);
+        unset($user['verification_code']);
+        unset($user['password']);
         response(StatusCode::OK, successMessage('User successfully retrieved from the server', $user));
         return;
     }
@@ -303,5 +328,119 @@ class UsersController
         unset($user['id']);
         unset($user['session_token']);
         response(StatusCode::OK, successMessage('User successfully updated', $user));
+    }
+
+    public function verify(array $params): void
+    {
+        $code = $params['data']->code;
+        $email = $params['user']->data->email;
+
+        if (!$this->SchemaValidation->validateCode($code))
+            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'The code must be six digits', StatusCode::FORBIDDEN));
+
+        $user = UserModel::verify(email: $email, code: (int) $code);
+
+        if (!is_array($user))
+            response(StatusCode::BAD_REQUEST, errorMessage('Credential Error', 'Verification code is incorrect or expired', StatusCode::BAD_REQUEST));
+
+        $username = "{$user['firstname']} {$user['lastname']}";
+
+        $payload = [
+            "iss" => $_ENV['APP_URL'],
+            "iat" => time(),
+            "exp" => time() + $_ENV['JWT_EXP'],
+            "data" => [
+                "uuid" => $user['user_uuid'],
+                "name" => $username,
+                "email" => $user['email'],
+                "role" => $user['role'],
+                "isRestricted" => $user['is_restricted'],
+                "canAccessQuiz" => $user['can_access_quiz'],
+            ],
+        ];
+
+        $jwt = JWT::encode($payload, $_ENV['JWT_KEY'], $_ENV['JWT_ALGO']);
+        if (UserModel::setSessionToken($jwt, $user['user_uuid']))
+            response(StatusCode::OK, successMessage("User is verified successfully", ["token" => $jwt]));
+
+        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Server Error', 'Could not store session token', StatusCode::INTERNAL_SERVER_ERROR));
+    }
+
+    public function resend(array $params): void
+    {
+        $email = $params['data']->email;
+
+        if (!$this->SchemaValidation->validateEmail($email))
+            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'Invalid Email Address', StatusCode::FORBIDDEN));
+
+        $user = UserModel::findByEmail($email);
+        if ($user === false)
+            response(StatusCode::NOT_FOUND, errorMessage('Not Found', 'User is not yet registered', StatusCode::NOT_FOUND));
+
+        (new VerificationRequestMiddleware($user))->handle();
+
+        $verificationCode = MailService::sendCode($email);
+        if (!$verificationCode)
+            response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Mailer Error', 'Verification code could not be sent.', StatusCode::INTERNAL_SERVER_ERROR));
+
+        $payload = [
+            "iss" => $_ENV['APP_URL'],
+            "iat" => time(),
+            "exp" => time() + 600,
+            "data" => [
+                "email" => $email,
+            ],
+        ];
+
+        if (UserModel::saveCode($email, $verificationCode)) {
+            $jwt = JWT::encode($payload, $_ENV['JWT_KEY'], $_ENV['JWT_ALGO']);
+            UserModel::setSessionToken($jwt, $user['user_uuid']);
+            response(StatusCode::CREATED, successMessage('Verification code sent successfully', ['token' => $jwt]));
+        }
+
+        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'For some reason, verification code could not be saved on the server', StatusCode::INTERNAL_SERVER_ERROR));
+    }
+
+    public function request(array $params): void
+    {
+        $email = $params['data']->email;
+
+        if (!$this->SchemaValidation->validateEmail($email))
+            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'Invalid Email Address', StatusCode::FORBIDDEN));
+
+        $user = UserModel::findByEmail($email);
+        if ($user === false)
+            response(StatusCode::NOT_FOUND, errorMessage('Not Found', 'User is not yet registered', StatusCode::NOT_FOUND));
+
+        // (new LoginMiddleware($user))->handle();
+
+        $OTP = MailService::sendCode($email, true);
+        if (!$OTP)
+            response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Mailer Error', 'OTP could not be sent.', StatusCode::INTERNAL_SERVER_ERROR));
+
+        $payload = [
+            "iss" => $_ENV['APP_URL'],
+            "iat" => time(),
+            "exp" => time() + 600,
+            "data" => [
+                "email" => $email,
+            ],
+        ];
+
+        if (UserModel::saveOTP($email, $OTP)) {
+            $jwt = JWT::encode($payload, $_ENV['JWT_KEY'], $_ENV['JWT_ALGO']);
+            UserModel::setSessionToken($jwt, $user['user_uuid']);
+            response(StatusCode::CREATED, successMessage('OTP sent successfully', ['token' => $jwt]));
+        }
+
+        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'For some reason, OTP could not be saved on the server', StatusCode::INTERNAL_SERVER_ERROR));
+    }
+
+    public function reset(array $params): void
+    {
+        $data = $params['data'];
+
+        if (!$this->SchemaValidation->validatePasswordReset($data))
+            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'Invalid Schema', StatusCode::FORBIDDEN));
     }
 }
