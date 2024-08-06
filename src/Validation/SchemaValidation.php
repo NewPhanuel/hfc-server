@@ -27,7 +27,7 @@ class SchemaValidation
     }
     public function validatePasswordReset(object $data): bool
     {
-        $schemaValidator = validate::attribute('code', validate::digit()->length(6, 6))
+        $schemaValidator = validate::attribute('otp', validate::digit()->length(6, 6))
             ->attribute('password', validate::regex(self::PASSWORD_REGEX));
         return $schemaValidator->validate($data);
     }

@@ -242,8 +242,12 @@ final class UserModel
             return false;
         }
 
+        if ($userEntity->getOTP() !== (int) $userBean['OTP'])
+            return false;
+
         $userBean['password'] = $userEntity->getPassword();
         $userBean['last_password_reset'] = $userEntity->getLastPasswordReset();
+        $userBean['OTP'] = null;
         R::store($userBean);
         R::close();
         return true;

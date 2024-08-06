@@ -5,6 +5,7 @@ namespace DevPhanuel\Controllers;
 
 use DevPhanuel\Core\MailService;
 use DevPhanuel\Core\Middleware\LoginMiddleware;
+use DevPhanuel\Core\Middleware\PasswordResetMiddleware;
 use DevPhanuel\Core\Middleware\VerificationRequestMiddleware;
 use DevPhanuel\Exception\InvalidValidationException;
 use DevPhanuel\Models\Entity\AccountEntity;
@@ -439,8 +440,30 @@ class UsersController
     public function reset(array $params): void
     {
         $data = $params['data'];
+        $email = $params['user']->data->email;
 
         if (!$this->SchemaValidation->validatePasswordReset($data))
-            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'Invalid Schema', StatusCode::FORBIDDEN));
+            response(StatusCode::FORBIDDEN, errorMessage('Invalid Validation Error', 'Invalid Email or OTP', StatusCode::FORBIDDEN));
+
+        $user = UserModel::findByEmail($email);
+        if ($user === false)
+            response(StatusCode::NOT_FOUND, errorMessage('Not Found', 'User is not yet registered', StatusCode::NOT_FOUND));
+
+        (new PasswordResetMiddleware($user, (int) $data->otp))->handle();
+
+        $userEntity = new UserEntity();
+        $userEntity->setEmail($email)->setPassword($data->password)->setOTP((int) $data->otp)
+            ->setLastPasswordReset(date(self::DATE_TIME_FORMAT));
+        $username = $user['firstname'] . ' ' . $user['lastname'];
+
+        if (UserModel::changePassword($userEntity)) {
+            UserModel::clearSessionToken($user['user_uuid']);
+            response(StatusCode::OK, successMessage('Password changed successfully. Log in to continue', [
+                "name" => $username,
+                "email" => $email,
+            ]));
+        }
+
+        response(StatusCode::INTERNAL_SERVER_ERROR, errorMessage('Internal Server Error', 'For some reason, the password could not be changed', StatusCode::INTERNAL_SERVER_ERROR));
     }
 }
