@@ -26,5 +26,5 @@ $router->post('api/v1/auth/login', 'UsersController@login', 'guest'); // Test Pa
 $router->post('api/v1/auth/logout', 'UsersController@logout', 'auth'); // Test Passed
 $router->post('api/v1/auth/resend', 'UsersController@resend', 'guest'); // Test Passed
 $router->post('api/v1/auth/verify', 'UsersController@verify', 'new'); // Test Passed
-$router->post('api/v1/auth/request', 'UsersController@request', 'guest');
-$router->post('api/v1/auth/reset', 'UsersController@reset', 'new');
+$router->post('api/v1/auth/request', 'UsersController@request', 'guest'); // Test Passed
+$router->post('api/v1/auth/reset', 'UsersController@reset', 'new');// Test Passed
