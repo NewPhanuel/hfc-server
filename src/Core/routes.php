@@ -21,10 +21,10 @@ $router->put('api/v1/blogs/{uuid}', 'BlogsController@update', 'admin');
 $router->delete('api/v1/blogs/{uuid}', 'BlogsController@destroy', 'admin');
 
 // Auth Routes
-$router->post('api/v1/auth/register', 'UsersController@store', 'guest'); // Test Passed
-$router->post('api/v1/auth/login', 'UsersController@login', 'guest'); // Test Passed
-$router->post('api/v1/auth/logout', 'UsersController@logout', 'auth'); // Test Passed
-$router->post('api/v1/auth/resend', 'UsersController@resend', 'guest'); // Test Passed
-$router->post('api/v1/auth/verify', 'UsersController@verify', 'new'); // Test Passed
-$router->post('api/v1/auth/request', 'UsersController@request', 'guest'); // Test Passed
-$router->post('api/v1/auth/reset', 'UsersController@reset', 'new');// Test Passed
+$router->post('api/v1/auth/register', 'AuthController@store', 'guest'); // Test Passed
+$router->post('api/v1/auth/login', 'AuthController@login', 'guest'); // Test Passed
+$router->post('api/v1/auth/logout', 'AuthController@logout', 'auth'); // Test Passed
+$router->post('api/v1/auth/resend', 'AuthController@resend', 'guest'); // Test Passed
+$router->post('api/v1/auth/verify', 'AuthController@verify', 'new'); // Test Passed
+$router->post('api/v1/auth/request', 'AuthController@request', 'guest'); // Test Passed
+$router->post('api/v1/auth/reset', 'AuthController@reset', 'new');// Test Passed

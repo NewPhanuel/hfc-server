@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Core\Middleware;
 
-use DevPhanuel\Models\UserModel;
+use DevPhanuel\Models\AuthModel;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -25,7 +25,7 @@ class Authenticate
 
         $token = str_replace('Bearer ', '', $headers['Authorization']);
 
-        $user = UserModel::validateToken($token);
+        $user = AuthModel::validateToken($token);
         if ($user === false)
             return null;
 
