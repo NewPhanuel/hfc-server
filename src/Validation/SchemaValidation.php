@@ -14,7 +14,18 @@ class SchemaValidation
     public function validateUserSchema(object $data): bool
     {
         $schemaValidator = validate::attribute('email', validate::email())
+            ->attribute('firstname', validate::stringType()->length(self::MIN_NAME_LENGTH, self::MAX_NAME_LENGTH))
+            ->attribute('lastname', validate::stringType()->length(self::MIN_NAME_LENGTH, self::MAX_NAME_LENGTH))
+            ->attribute('gender', validate::stringType(), mandatory: false)
+            ->attribute('dob', validate::date(), mandatory: false)
             ->attribute('password', validate::regex(self::PASSWORD_REGEX));
+        return $schemaValidator->validate($data);
+    }
+
+    public function validateLoginSchema(object $data): bool
+    {
+        $schemaValidator = validate::attribute('email', validate::email())
+            ->attribute('password', validate::stringType()->length(6));
         return $schemaValidator->validate($data);
     }
     public function validateCode(string $code): bool
@@ -43,9 +54,6 @@ class SchemaValidation
             ->attribute('role', validate::stringType(), mandatory: false)
             ->attribute('is_restricted', validate::stringType(), mandatory: false)
             ->attribute('can_access_quiz', validate::stringType(), mandatory: false)
-            ->attribute('address', validate::stringType(), mandatory: false)
-            ->attribute('department', validate::stringType(), mandatory: false)
-            ->attribute('department_level', validate::stringType(), mandatory: false)
             ->attribute('quiz_attempt', validate::stringType(), mandatory: false)
             ->attribute('scores', validate::stringType(), mandatory: false)
             ->key('account', validate::key('email', validate::email(), mandatory: false)
@@ -60,6 +68,9 @@ class SchemaValidation
                 ->key('bank_name', validate::stringType(), mandatory: false)
                 ->key('acct_number', validate::stringType(), mandatory: false)
                 ->key('acct_name', validate::stringType(), mandatory: false)
+                ->key('address', validate::stringType(), mandatory: false)
+                ->key('department', validate::stringType(), mandatory: false)
+                ->key('department_level', validate::stringType(), mandatory: false)
                 ->key('is_deactivated', validate::stringType(), mandatory: false), mandatory: false);
         return $schemaValidator->validate($data);
     }
@@ -69,21 +80,19 @@ class SchemaValidation
         return validate::uuid(4)->validate($uuid);
     }
 
-    public function validateEventSchema(object $data): bool
+    public function validateBlogSchema(object $data): bool
     {
-        $schemaValidator = validate::attribute('event_name', validate::stringType())
-            ->attribute('description', validate::stringType())
-            ->attribute('event_date', validate::stringType())
-            ->attribute('event_image', validate::stringType());
+        $schemaValidator = validate::attribute('blog_name', validate::stringType())
+            ->attribute('body', validate::stringType())
+            ->attribute('blog_image', validate::stringType());
         return $schemaValidator->validate($data);
     }
 
-    public function validateEventSchemaForUpdate(object $data): bool
+    public function validateBlogSchemaForUpdate(object $data): bool
     {
-        $schemaValidator = validate::attribute('event_name', validate::stringType(), mandatory: false)
-            ->attribute('description', validate::stringType(), mandatory: false)
-            ->attribute('event_date', validate::stringType(), mandatory: false)
-            ->attribute('event_image', validate::stringType(), mandatory: false);
+        $schemaValidator = validate::attribute('blog_name', validate::stringType(), mandatory: false)
+            ->attribute('body', validate::stringType(), mandatory: false)
+            ->attribute('blog_image', validate::stringType(), mandatory: false);
         return $schemaValidator->validate($data);
     }
 }

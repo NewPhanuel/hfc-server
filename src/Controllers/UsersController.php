@@ -30,7 +30,7 @@ class UsersController
     {
         $data = $params['data'];
 
-        if (!$this->SchemaValidation->validateUserSchema($data))
+        if (!$this->SchemaValidation->validateLoginSchema($data))
             response(StatusCode::BAD_REQUEST, errorMessage('Validation Error', 'User data does not follow validation rules', StatusCode::BAD_REQUEST));
 
         $user = UserModel::authorise(email: $data->email, password: $data->password);
@@ -101,8 +101,8 @@ class UsersController
 
         $userEntity = new UserEntity();
         $userEntity->setUserUuid($data->userUuid)->setEmail($data->email)->setPassword($data->password)
-            ->setCreatedAt($data->createdAt)
-            ->setUpdatedAt($data->updatedAt);
+            ->setFirstname($data->firstname)->setLastname($data->lastname)->setGender($data->gender)->setDob($data->dob)
+            ->setCreatedAt($data->createdAt)->setUpdatedAt($data->updatedAt);
 
         $accountEntity = new AccountEntity();
         $accountEntity->setUserUuid($data->userUuid)->setCreatedAt($data->createdAt)
@@ -162,12 +162,6 @@ class UsersController
             $userEntity->setPhone($data->phone);
         if (isset($data->dob))
             $userEntity->setDob($data->dob);
-        if (isset($data->address))
-            $userEntity->setAddress($data->address);
-        if (isset($data->department))
-            $userEntity->setDepartment($data->department);
-        if (isset($data->department_level))
-            $userEntity->setDepartmentLevel($data->department_level);
         if (isset($data->account)) {
             if (isset($data->account->email))
                 $accountEntity->setEmail($data->account->email);
@@ -183,6 +177,12 @@ class UsersController
                 $accountEntity->setAcctNumber($data->account->acct_number);
             if (isset($data->account->acct_name))
                 $accountEntity->setAcctName($data->account->acct_name);
+            if (isset($data->account->address))
+                $accountEntity->setAddress($data->account->address);
+            if (isset($data->account->department))
+                $accountEntity->setDepartment($data->account->department);
+            if (isset($data->account->department_level))
+                $accountEntity->setDepartmentLevel($data->account->department_level);
         }
         $accountEntity->setUpdatedAt($data->updatedAt);
         $userEntity->setUpdatedAt($data->updatedAt);
@@ -281,12 +281,6 @@ class UsersController
             $userEntity->setIsRestricted($data->is_restricted);
         if (isset($data->can_access_quiz))
             $userEntity->setCanAccessQuiz($data->can_access_quiz);
-        if (isset($data->address))
-            $userEntity->setAddress($data->address);
-        if (isset($data->department))
-            $userEntity->setDepartment($data->department);
-        if (isset($data->department_level))
-            $userEntity->setDepartmentLevel($data->department_level);
         if (isset($data->quiz_attempt))
             $userEntity->setQuizAttempt($data->quiz_attempt);
         if (isset($data->scores))
@@ -316,6 +310,12 @@ class UsersController
                 $accountEntity->setAcctNumber($data->account->acct_number);
             if (isset($data->account->acct_name))
                 $accountEntity->setAcctName($data->account->acct_name);
+            if (isset($data->account->address))
+                $accountEntity->setAddress($data->account->address);
+            if (isset($data->account->department))
+                $accountEntity->setDepartment($data->account->department);
+            if (isset($data->account->department_level))
+                $accountEntity->setDepartmentLevel($data->account->department_level);
             if (isset($data->account->is_deactivated))
                 $accountEntity->setIsDeactivated($data->account->is_deactivated);
         }

@@ -3,23 +3,22 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Models\Entity;
 
-class EventEntity
+class BlogEntity
 {
     private string $uuid;
     private ?string $name = null;
-    private ?string $description = null;
-    private ?string $date = null;
+    private ?string $body = null;
     private ?string $image = null;
     private string $createdBy;
     private string $createdAt;
     private string $updatedAt;
 
-    public function getEventUuid(): ?string
+    public function getBlogUuid(): ?string
     {
         return $this->uuid;
     }
 
-    public function setEventUuid(string $uuid): self
+    public function setBlogUuid(string $uuid): self
     {
         $this->uuid = $uuid;
         return $this;
@@ -36,28 +35,16 @@ class EventEntity
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getBody(): ?string
     {
-        return $this->description;
+        return $this->body;
     }
 
-    public function setDescription(string $description): self
+    public function setBody(string $body): self
     {
-        $this->description = $description;
+        $this->body = $body;
         return $this;
     }
-
-    public function getDate(): ?string
-    {
-        return $this->date;
-    }
-
-    public function setDate(string $date): self
-    {
-        $this->date = $date;
-        return $this;
-    }
-
     public function getImage(): ?string
     {
         return $this->image;

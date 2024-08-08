@@ -70,12 +70,6 @@ final class UserModel
             $userBean['dob'] = $userEntity->getDob();
         if ($userEntity->getPhone())
             $userBean['phone'] = $userEntity->getPhone();
-        if ($userEntity->getAddress())
-            $userBean['address'] = $userEntity->getAddress();
-        if ($userEntity->getDepartment())
-            $userBean['department'] = $userEntity->getDepartment();
-        if ($userEntity->getDepartmentLevel())
-            $userBean['department_level'] = $userEntity->getDepartmentLevel();
         if ($userEntity->getRole())
             $userBean['role'] = $userEntity->getRole()->value;
         if ($userEntity->getIsRestricted())

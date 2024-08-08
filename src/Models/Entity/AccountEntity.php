@@ -22,6 +22,9 @@ class AccountEntity
     private ?string $bankName = null;
     private ?string $acctNumber = null;
     private ?string $acctName = null;
+    private ?string $address = null;
+    private ?string $department = null;
+    private ?string $departmentLevel = null;
     private Boolean $isDeactivated = Boolean::FALSE;
     private string $createdAt;
     private string $updatedAt;
@@ -288,6 +291,40 @@ class AccountEntity
 
         return $this;
     }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+        return $this;
+    }
+
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(string $department): self
+    {
+        $this->department = $department;
+        return $this;
+    }
+
+    public function getDepartmentLevel(): ?string
+    {
+        return $this->departmentLevel;
+    }
+
+    public function setDepartmentLevel(string $departmentLevel): self
+    {
+        $this->departmentLevel = $departmentLevel;
+        return $this;
+    }
+
 
     /**
      * Get the value of isDeactivated

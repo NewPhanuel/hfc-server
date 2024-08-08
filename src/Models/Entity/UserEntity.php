@@ -24,9 +24,6 @@ class UserEntity
     private Boolean $isVerified = Boolean::FALSE;
     private Boolean $isRestricted = Boolean::FALSE;
     private Boolean $canAccessQuiz = Boolean::FALSE;
-    private ?string $address = null;
-    private ?string $department = null;
-    private ?string $departmentLevel = null;
     private ?int $quizAttempt = 0;
     private ?int $scores = 0;
     private ?int $verificationCode = null;
@@ -209,39 +206,6 @@ class UserEntity
         } catch (ValueError) {
             throw new ErrorException('Invalid Boolean Type');
         }
-    }
-
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
-
-    public function setAddress(string $address): self
-    {
-        $this->address = $address;
-        return $this;
-    }
-
-    public function getDepartment(): ?string
-    {
-        return $this->department;
-    }
-
-    public function setDepartment(string $department): self
-    {
-        $this->department = $department;
-        return $this;
-    }
-
-    public function getDepartmentLevel(): ?string
-    {
-        return $this->departmentLevel;
-    }
-
-    public function setDepartmentLevel(string $departmentLevel): self
-    {
-        $this->departmentLevel = $departmentLevel;
-        return $this;
     }
 
     public function getQuizAttempt(): ?int

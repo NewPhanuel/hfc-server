@@ -68,6 +68,12 @@ final class AccountModel
             $accountBean['acct_name'] = $accountEntity->getAcctName();
         if ($accountEntity->getAcctNumber())
             $accountBean['acct_number'] = $accountEntity->getAcctNumber();
+        if ($accountEntity->getAddress())
+            $accountBean['address'] = $accountEntity->getAddress();
+        if ($accountEntity->getDepartment())
+            $accountBean['department'] = $accountEntity->getDepartment();
+        if ($accountEntity->getDepartmentLevel())
+            $accountBean['department_level'] = $accountEntity->getDepartmentLevel();
         if ($accountEntity->getIsDeactivated())
             $accountBean['is_deactivated'] = $accountEntity->getIsDeactivated()->value;
         if ($accountEntity->getUpdatedAt())
