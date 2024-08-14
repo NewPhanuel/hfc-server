@@ -28,6 +28,10 @@ final class UserModel
 
         $userBean = R::dispense(self::TABLE_NAME);
         $userBean['user_uuid'] = $userEntity->getUserUuid();
+        $userBean['firstname'] = $userEntity->getFirstname();
+        $userBean['lastname'] = $userEntity->getLastname();
+        $userBean['gender'] = $userEntity->getGender()->value;
+        $userBean['dob'] = $userEntity->getDob();
         $userBean['email'] = $userEntity->getEmail();
         $userBean['password'] = $userEntity->getPassword();
         $userBean['role'] = $userEntity->getRole()->value;

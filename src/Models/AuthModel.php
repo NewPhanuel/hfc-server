@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Models;
 
-use DevPhanuel\Exception\InvalidValidationException;
-use DevPhanuel\Models\Entity\AccountEntity;
 use DevPhanuel\Models\Entity\UserEntity;
 use RedBeanPHP\RedException\SQL as RedBeanSQLException;
 use RedBeanPHP\R;

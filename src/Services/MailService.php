@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DevPhanuel\Core;
+namespace DevPhanuel\Services;
 
 use Exception;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -10,7 +10,6 @@ class MailService
 {
     private const SERVER_EMAIL = "noreply@hfc-server.com";
     private const SERVER_NAME = "hfc-server";
-    private const VERIFICATION_MSG = "Your verification code is: ";
 
     public static function generateSixDigits()
     {

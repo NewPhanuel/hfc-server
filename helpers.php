@@ -181,11 +181,11 @@ function successMessage(?string $message = '', array|object $data = []): array
  * Composes an error message to be sent to the client
  *
  * @param string|null $type
- * @param string|null $message
+ * @param string|null|array $message
  * @param mixed $code
  * @return array
  */
-function errorMessage(?string $type, ?string $message, mixed $code = 0): array
+function errorMessage(?string $type, string|null|array $message, mixed $code = 0): array
 {
     return [
         'error' => [

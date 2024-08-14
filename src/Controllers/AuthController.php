@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Controllers;
 
-use DevPhanuel\Core\MailService;
+use DevPhanuel\Services\MailService;
 use DevPhanuel\Core\Middleware\LoginMiddleware;
 use DevPhanuel\Core\Middleware\PasswordResetMiddleware;
 use DevPhanuel\Core\Middleware\VerificationRequestMiddleware;
-use DevPhanuel\Exception\InvalidValidationException;
 use DevPhanuel\Models\Entity\AccountEntity;
 use DevPhanuel\Models\AuthModel;
 use DevPhanuel\Models\UserModel;

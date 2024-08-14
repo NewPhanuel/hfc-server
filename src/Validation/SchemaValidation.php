@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Validation;
 
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator as validate;
 
 class SchemaValidation
@@ -94,5 +95,34 @@ class SchemaValidation
             ->attribute('body', validate::stringType(), mandatory: false)
             ->attribute('blog_image', validate::stringType(), mandatory: false);
         return $schemaValidator->validate($data);
+    }
+
+    public function validateQuiz(object $data): bool|array
+    {
+        // response(200, ["data" => $data]);
+        // Define the validators for options
+        $optionValidator = validate::objectType()
+            ->attribute('option_text', validate::stringType()->notEmpty())
+            ->attribute('is_correct', validate::stringType()->notEmpty()->length(4, 5));
+
+        // Define the validator for questions
+        $questionValidator = validate::objectType()
+            ->attribute('question_text', validate::stringType()->notEmpty())
+            ->attribute('options', validate::arrayType()->notEmpty()->each($optionValidator));
+
+        // Define the validator for the entire JSON structure
+        $quizValidator = validate::objectType()
+            ->attribute('title', validate::stringType()->notEmpty())
+            ->attribute('description', validate::stringType()->notEmpty())
+            ->attribute('questions', validate::arrayType()->notEmpty()->each($questionValidator));
+
+        try {
+            // Validate the data
+            $quizValidator->assert($data);
+            return true; // If validation passes
+        } catch (NestedValidationException $e) {
+            // Handle validation errors
+            return $e->getMessages(); // Returns an array of error messages
+        }
     }
 }
