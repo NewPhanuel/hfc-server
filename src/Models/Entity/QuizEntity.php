@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace DevPhanuel\Models\Entity;
 
+use Ramsey\Uuid\Nonstandard\Uuid;
+
 class QuizEntity
 {
+    private const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
     private string $quizUuid;
     private ?string $title = null;
     private ?string $description = null;
@@ -16,9 +19,9 @@ class QuizEntity
         return $this->quizUuid;
     }
 
-    public function setQuizUuid(string $quizUuid): self
+    public function setQuizUuid(): self
     {
-        $this->quizUuid = $quizUuid;
+        $this->quizUuid = (string) Uuid::uuid4();
         return $this;
     }
 
@@ -49,9 +52,9 @@ class QuizEntity
         return $this->createdAt;
     }
 
-    public function setCreatedAt(string $createdAt): self
+    public function setCreatedAt(): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = date(self::DATE_TIME_FORMAT);
         return $this;
     }
 
@@ -60,9 +63,9 @@ class QuizEntity
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(string $updatedAt): self
+    public function setUpdatedAt(): self
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = date(self::DATE_TIME_FORMAT);
         return $this;
     }
 }

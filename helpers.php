@@ -211,3 +211,18 @@ function response(int $statusCode, array|object $response = []): void
     echo json_encode($response);
     exit;
 }
+
+/**
+ * Returns a response with data and HTTP and allows the script to continue running
+ * header to the client
+ *
+ * @param integer $statusCode
+ * @param array $response
+ * @return void
+ */
+function respond(int $statusCode, array|object $response = []): void
+{
+    Http::setHeadersByCode($statusCode);
+    Http::setContentType('application/json');
+    echo json_encode($response);
+}

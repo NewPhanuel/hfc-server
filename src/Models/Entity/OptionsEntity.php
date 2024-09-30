@@ -5,11 +5,13 @@ namespace DevPhanuel\Models\Entity;
 
 use DevPhanuel\Models\Enums\Boolean;
 use ErrorException;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use ValueError;
 
 class OptionsEntity
 {
-    private string $optionsUuid;
+    private const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    private string $optionUuid;
     private string $questionUuid;
     private ?string $optionText;
     private Boolean $isCorrect = Boolean::FALSE;
@@ -17,25 +19,25 @@ class OptionsEntity
     private string $updatedAt;
 
     /**
-     * Get the value of optionsUuid
+     * Get the value of optionUuid
      *
      * @return string
      */
-    public function getOptionsUuid(): string
+    public function getOptionUuid(): string
     {
-        return $this->optionsUuid;
+        return $this->optionUuid;
     }
 
     /**
-     * Set the value of optionsUuid
+     * Set the value of optionUuid
      *
-     * @param string $optionsUuid
+     * @param string $optionUuid
      *
      * @return self
      */
-    public function setOptionsUuid(string $optionsUuid): self
+    public function setOptionUuid(): self
     {
-        $this->optionsUuid = $optionsUuid;
+        $this->optionUuid = (string) Uuid::uuid4();
         return $this;
     }
 
@@ -129,9 +131,9 @@ class OptionsEntity
      *
      * @return self
      */
-    public function setCreatedAt(string $createdAt): self
+    public function setCreatedAt(): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = date(self::DATE_TIME_FORMAT);
         return $this;
     }
 
@@ -152,9 +154,9 @@ class OptionsEntity
      *
      * @return self
      */
-    public function setUpdatedAt(string $updatedAt): self
+    public function setUpdatedAt(): self
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = date(self::DATE_TIME_FORMAT);
         return $this;
     }
 }

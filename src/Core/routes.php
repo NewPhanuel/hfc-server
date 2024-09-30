@@ -28,7 +28,7 @@ $router->post('api/v1/quizzes', 'QuizController@store', 'admin');
 
 $router->put('api/v1/quizzes/{uuid}', 'QuizController@update', 'admin');
 
-$router->delete('api/v1/quizzes/{uuid}', 'QuizController@update', 'admin');
+$router->delete('api/v1/quizzes/{uuid}', 'QuizController@delete', 'admin');
 
 // Question Routes
 $router->get('api/v1/quizzes/{QuizUuid}/questions', 'QuestionsController@index', 'admin');
